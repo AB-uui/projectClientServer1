@@ -4,8 +4,10 @@ const User = require('../models/User')
 // לחיצה על כפתור Users –תגרום להצגת רשימת ה- users.
 // פריטים ברשימה יסודרו לפי מספר ה- id שלהם
 const getAllUsers = async (req,res)=>{
-    const page = req.params
+    const {page} = req.params
+    console.log(Number(page)*10)
     const users = await User.find().sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+
     if(!users){
         return res.status(400).send("no users found")
     }

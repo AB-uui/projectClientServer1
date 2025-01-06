@@ -1,5 +1,5 @@
 import './App.css';
-import { Routes, Route,Router, Link } from "react-router-dom";
+import { Routes, Route,Router, Link, useNavigate } from "react-router-dom";
 import Users from './components/user';
 import Todos from './components/todo';
 import Posts from './components/post';
@@ -10,12 +10,17 @@ import Photos from './components/photo';
 // import * as React from 'react';
 // import { styled, useTheme } from '@mui/material/styles';
 import React, { useState } from "react";
-import { AppBar, Toolbar, IconButton, Drawer, Typography, Grid, Box, Button,Select ,FormControl,MenuItem,InputLabel, OutlinedInput, TextField} from "@mui/material";
+import { AppBar, Toolbar, IconButton, Drawer, Typography, Grid, Box, Button,Select ,FormControl,MenuItem,InputLabel, OutlinedInput, TextField, Pagination, Stack, Fab} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Navbar from "./components/navbarMenu";
 import FullWidthTabs from './components/navbarMenu';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AddIcon from '@mui/icons-material/Add';
+import FormDialog from './components/userA';
 
 function App() {
+  const navigate = useNavigate()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [whatOpen, setWhatOpen] = useState("Aplication");
   const [view, setView] = useState("0");
@@ -50,6 +55,14 @@ function App() {
   const handleChange = (event) => {
     setView(event.target.value);
   };
+  const [page, setPage] = React.useState(0);
+
+  const handlePage = (event, value) => {
+    setPage(value-1);
+    console.log(value);
+    
+  };
+
   return (
     
     <Box sx={{ flexGrow: 1 }}>
@@ -178,6 +191,7 @@ function App() {
       {/* <Grid container rowSpacing={0} columnSpacing={{ xs: 1, sm: 12, md: 3 }}> */}
       <Grid  container  rowSpacing={2} xs={12} sm={12} md={12} >
 <Grid xs={12}>
+
         <Box
           sx={{
             padding: 20,
@@ -188,23 +202,30 @@ function App() {
         >
           Grid Item 1
           <Routes>
-       <Route path="/users" element = {<Users/>}/>
+       <Route path="/users" element = {<Users page={page} ah={ah}/>}/>
            <Route path="/todos" element = {<Todos/>}/>
            <Route path="/posts" element = {<Posts/>}/>
            <Route path="/photos" element = {<Photos/>}/>
+           <Route path="/add" element = {<FormDialog/>}/>
          </Routes>
         </Box>
         </Grid> 
 <Grid xs={12}>
+<Box sx={{ width:"40%"}} />
 <Box
           sx={{
             padding: 2,
-            textAlign: "left",
+            textAlign: "center",
             backgroundColor: "#fff",
             borderRadius: 2,
+            
           }}
         >
           Grid Item 2
+          <Stack spacing={2}>
+      <Typography>Page: {page}</Typography>
+      <Pagination count={10}  onChange={handlePage} />
+    </Stack>
         </Box>
 </Grid> 
 
@@ -218,7 +239,10 @@ function App() {
             borderRadius: 2,
           }}
         >
-          Grid Item 2
+          Grid Item 3
+          {/* {ah&&(<Fab color="primary" aria-label="add" size='medium' onClick={handleAdd}>
+  <AddIcon />
+</Fab>)} */}
         </Box></Grid>
       </Grid>
     {/* ))} */}
