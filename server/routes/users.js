@@ -3,7 +3,7 @@ const router = express.Router()
 const usersController = require('../controllers/usersController')
 const setDefaultUsername = require('../middleware/usersMidlleware');
 
-router.get('/',usersController.getFilterUsers)
+router.get('/ByText',usersController.getFilterUsers)
 router.get('/address/:page',usersController.getUsersWithAddress)
 router.get('/:page',usersController.getAllUsers)
 router.post('/', setDefaultUsername, usersController.createUser)

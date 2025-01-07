@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useState, useEffect, useRef } from 'react'
 
 import * as React from 'react';
-import { Box,Checkbox, Card, CardActions, CardContent, Button, Typography, CardActionArea } from '@mui/material';
+import { Box, Checkbox, Card, CardActions, CardContent, Button, Typography, CardActionArea } from '@mui/material';
 import { Fab, Pagination, PaginationItem, Stack, Alert, Snackbar } from '@mui/material';
 import { TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
@@ -66,26 +66,32 @@ const Todos = (props) => {
 
     const getTodos = async () => {
         setLoading(true);
+        console.log(props.view);
+        console.log("props.view");
+        
         try {
-            const res = await axios.get(`http://localhost:7777/api/todos/${props.page}`)
-            if (res.status === 200 && Array.isArray(res.data)) {
-                setTodosData(res.data)
+            let res;
+            if (!props.text) {
+                res = await axios.get(`http://localhost:7777/api/todos/${props.page}`);
+            } else {
+                res = await axios.get(`http://localhost:7777/api/todos/ByText?page=${props.page}&text=${props.text}`);
             }
-            else {
-                setTodosData([])
 
+            if (res.status === 200 && Array.isArray(res.data)) {
+                setTodosData(res.data);
+            } else {
+                setTodosData([]);
             }
         } catch (e) {
-            console.error(e)
+            console.error(e);
             setTodosData([]);
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
-    }
+    };
     useEffect(() => {
         getTodos();
-    }, [props.page]);
+    }, [props.page, props.text]);
     const bull = (
         <Box
             component="span"
@@ -125,10 +131,6 @@ const Todos = (props) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        // setSelectedTodo((prev) => ({
-        //     ...prev,
-        //     [name]: value
-        // }));
         if (name === "tags") {
             const tagsArray = value.split(",").map(tag => tag.trim()).filter(tag => tag !== "");
             setSelectedTodo(prevState => ({
@@ -181,6 +183,7 @@ const Todos = (props) => {
                         width: "100%",
                         display: "grid",
                         gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))",
+                        gridAutoRows: "1fr",
                         gap: 4,
                     }}
                 >
@@ -188,7 +191,13 @@ const Todos = (props) => {
                         <p>Loading...</p>
                     ) : todosData && todosData.length > 0 ? (
                         todosData.map((todo, index) => (
-                            <Card key={todo._id}>
+                            <Card key={todo._id}
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                    height: "100%",
+                                }}>
                                 <CardActionArea
                                     onClick={() => setSelectedCard(index === selectedCard ? null : index)}
                                     data-active={selectedCard === index ? "" : undefined}
@@ -202,7 +211,12 @@ const Todos = (props) => {
                                         },
                                     }}
                                 >
-                                    <CardContent>
+                                    <CardContent
+                                        sx={{
+                                            flexGrow: 1,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                        }}>
                                         <Typography
                                             variant="body2"
                                             color="text.secondary"
@@ -228,6 +242,7 @@ const Todos = (props) => {
                                         justifyContent: "flex-start",
                                         padding: "8px",
                                         gap: "0.5px",
+                                        marginTop: "auto",
                                         borderTop: "1px solid #ccc",
                                     }}
                                 >
@@ -328,7 +343,7 @@ const Todos = (props) => {
                         />
 
                         <DialogContentText>Tags (separate with commas)</DialogContentText>
-                        
+
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Checkbox
                                 checked={selectedTodo.completed}

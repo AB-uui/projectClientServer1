@@ -95,7 +95,7 @@ const getTodosByText = async (req,res)=>{
     const todos = await Todo.find({$or:[
            {title:{$regex:text,$options:'i'}},
            {tags:{$elemMatch:{$regex:text,$options:'i'}}}
-         ]}).sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+         ]}).sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!todos?.length){
         return res.status(400).send("no todos found")
     }

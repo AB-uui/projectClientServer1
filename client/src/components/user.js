@@ -56,17 +56,20 @@ const Users = (props) => {
 
   const getUsers = async () => {
     setLoading(true);
-    let res 
+    let res
     try {
-      console.log(props.view);
-      {
-      if(props.view==="1"){
-              res = await axios.get(`http://localhost:7777/api/users/${props.page}`)
+      if (!props.text) {
+        res = await axios.get(`http://localhost:7777/api/users/${props.page}`)
+
+      } else {
+        res = await axios.get(`http://localhost:7777/api/users/ByText?page=${props.page}&text=${props.text}`)
+
       }
-      else if(props.view==="2"){
-        res = await axios.get(`http://localhost:7777/api/users/address/${props.page}`)
-      }
-    }
+      //   }
+      //   else if(props.view==="2"){
+      //     res = await axios.get(`http://localhost:7777/api/users/address/${props.page}`)
+      //   }
+      // }
       if (res.status === 200 && Array.isArray(res.data)) {
         setUsersData(res.data)
       }
@@ -84,7 +87,7 @@ const Users = (props) => {
   }
   useEffect(() => {
     getUsers();
-  }, [props.page]);
+  }, [props.page,props.text]);
   const bull = (
     <Box
       component="span"
@@ -163,7 +166,7 @@ const Users = (props) => {
 
     handleClose();
   };
-  const [state,setState] = useState("")
+  const [state, setState] = useState("")
   return (
     <>
       <div>
@@ -267,7 +270,7 @@ const Users = (props) => {
           )}
         </Box>
       </div>
-   
+
       {props.ah && (<Fab
         color="primary"
         aria-label="add"

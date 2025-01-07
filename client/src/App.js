@@ -19,20 +19,22 @@ function App() {
   const navigate = useNavigate()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [whatOpen, setWhatOpen] = useState("Aplication");
-  const [view, setView] = useState("0");
+  const [view, setView] = useState(1);
   const [criteria, setCriteria] = useState(["criteria"]);
-  const [open, setOpen] = React.useState(false);
+  // const [open, setOpen] = React.useState(false);
   const [ah, setAh] = React.useState(false);
+  const [text, setText] = React.useState("");
 
   // const handleChangeOp = (event) => {
   //   setView(event.target.value);
   // };
   const filterHandle = (event) => {
-    // (event.target.value);
+    setText(event.target.value);
+    setPage(0)
   };
   
-  const handleClose = async () => {
-    setOpen(false);
+  // const handleClose = async () => {
+  //   setOpen(false);
     
     // const app = whatOpen.toLowerCase()
     // if (view === "0") {
@@ -46,11 +48,15 @@ function App() {
     //   }
     // }
     //send..
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
+  // };
+  // const handleChange1 = (event) => {
+  //   setView(event.target.value);
+  //   console.log(view);
+    
+  // };
+  // const handleOpen = () => {
+  //   setOpen(true);
+  // };
 
   const handleDrawerToggle = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -59,7 +65,7 @@ function App() {
   const handleChange = (event) => {
     const selectedValue = event.target.value;
     console.log(`${selectedValue} selectedValue`);
-    
+    console.log(view);
     setView(selectedValue)
     setPage(0)
     };
@@ -101,7 +107,7 @@ function App() {
             <TextField
               id="filled-textarea"
               label="search"
-              placeholder="Text or ID"
+              placeholder="Type text to search"
               multiline
               variant="filled"
               color='secondary'
@@ -110,25 +116,22 @@ function App() {
           </Box>)}
           <Box sx={{ width: "40%" }} />
 
-          <Button sx={{ display: 'block', mt: 2 }} onClick={handleOpen}>
-
-          </Button>
+          {/* <Button sx={{ display: 'block', mt: 2 }} onClick={handleOpen}></Button> */}
           {ah && (<FormControl sx={{ m: 1, width: 500 }}>
-            <InputLabel id="demo-controlled-open-select-label">view</InputLabel>
+            <InputLabel id="views-label">view</InputLabel>
             <Select
-              labelId="demo-controlled-open-select-label"
-              id="demo-controlled-open-select"
-              open={open}
-              onClose={handleClose}
-              onOpen={handleOpen}
+              labelId="views-label"
+              id="views-select"
+              // open={open}
+              // onClose={handleClose}
+              // onOpen={handleOpen}
               value={view}
-              label="All item"
-              onChange={handleChange}
+              label="view"
+              // onChange={handleChange1}
+              onSelect={handleChange}
             >
-              <MenuItem value="1">
-                <em>All item</em>
-              </MenuItem>
-              <MenuItem value="2">{criteria}</MenuItem>
+              <MenuItem value={0}>All item</MenuItem>
+              <MenuItem value= {1}>{criteria}</MenuItem>
 
             </Select>
           </FormControl>)}
@@ -149,9 +152,9 @@ function App() {
             >
 
               <Routes>
-                <Route path="/users" element={<Users key={page} view={view} page={page} ah={ah} />} />
-                <Route path="/todos" element={<Todos key={page} view={view} page={page} ah={ah} />} />
-                <Route path="/posts" element={<Posts key={page} view={view} page={page} ah={ah} />} />
+                <Route path="/users" element={<Users key={page} text={text} view={view} page={page} ah={ah} />} />
+                <Route path="/todos" element={<Todos key={page} text={text} view={view} page={page} ah={ah} />} />
+                <Route path="/posts" element={<Posts key={page} text={text} view={view} page={page} ah={ah} />} />
                 <Route path="/photos" element={<Photos />} />
                 <Route path="/add" element={<FormDialog />} />
               </Routes>

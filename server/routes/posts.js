@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 const postsController = require('../controllers/postsController')
 
-router.get('/',postsController.getPostsByText)
+router.get('/ByText',postsController.getPostsByText)
 router.get('/:page',postsController.getAllPosts)
 router.get('/new/:page',postsController.getNewPosts)
 router.post('/',postsController.createNewPost)
