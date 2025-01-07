@@ -11,15 +11,15 @@ const createNewTodo = async (req,res)=>{
     if(!todo){
         return res.status(400).send("invalid todo")
     }
-    res.status(201).json(todo)
+    res.json(`${todo.title} add`)
 }
 
 // לחיצה על כפתור Todos – תגרום להצגת רשימת ה- todos.
 // פריטים ברשימה יסודרו לפי מספר ה- id
 const getAllTodos = async (req,res)=>{
     // const {page=0} = req.query
-    const page = req.params
-    const todos = await Todo.find().sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+    const {page} = req.params
+    const todos = await Todo.find().sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!todos?.length){
         return res.status(400).send("no todos found")
     }
@@ -29,7 +29,8 @@ const getAllTodos = async (req,res)=>{
 // יישום הלקוח וקוד השרת יאפשרו קבלת )GE מספר רשומות לפי קריטריונים ו/או שאילתות.
 //משימות שלא הושלמו
 const getUncompletedTodos = async (req,res) => {
-    const uncompletedTodos = await Todo.find({completed:false}).sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+    const {page} = req.params
+    const uncompletedTodos = await Todo.find({completed:false}).sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!uncompletedTodos?.length){
         return res.status(400).send("no todos found")
     }

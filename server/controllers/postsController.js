@@ -5,7 +5,7 @@ const {format} = require('date-fns')
 // פריטים ברשימה יסודרו לפי מספר ה- id שלהם
 const getAllPosts = async (req,res)=>{
      const page = req.params
-        const posts = await Post.find().sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+        const posts = await Post.find().sort({_id:1}).skip(Number(page)*9).limit(9).lean()
         if(!posts?.length){
             return res.status(400).send("no posts found")
         }
@@ -15,7 +15,7 @@ const getAllPosts = async (req,res)=>{
 // יישום הלקוח וקוד השרת יאפשרו הבאת )GE מספר פריטים / לפי קריטריונים מסוימים.
 const getNewPosts = async (req,res)=>{
     const page = req.params
-    const posts = await Post.find({createdAt:{$gte:format(new Date(),"yyyy-MM-dd  HH:mm:ss")-10}}).sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+    const posts = await Post.find({createdAt:{$gte:format(new Date(),"yyyy-MM-dd  HH:mm:ss")-10}}).sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!posts?.length){
         return res.status(400).send("no posts found")
     }
@@ -32,7 +32,7 @@ const createNewPost = async (req,res)=>{
     if(!post){
         return res.status(400).send("invalid post")
     }
-    res.status(201).json(post)
+    res.json(`${post.title} updated`)
 }
 
 // יישום הלקוח וקוד השרת יאפשרו עדכון  )Pפפריט מסוים תוכן post

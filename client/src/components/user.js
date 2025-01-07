@@ -1,329 +1,383 @@
 import axios from 'axios'
-import { useState,useEffect,useRef } from 'react'
-
+import { useState, useEffect, useRef } from 'react'
 
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
-import { Fab, Pagination, PaginationItem, Stack } from '@mui/material';
-
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import { Box, Card, CardActions, CardContent, Button, Typography, CardActionArea } from '@mui/material';
+import { Fab, Pagination, PaginationItem, Stack, Alert, Snackbar } from '@mui/material';
+import { TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
-
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const Users = (props) => {
-  const [selectedCard, setSelectedCard] = React.useState(0);
 
-  const cards = [
-    {
-      id: 1,
-      title: 'Plants',
-      description: 'Plants are essential for all life.',
-    },
-    {
-      id: 2,
-      title: 'Animals',
-      description: 'Animals are a part of nature.',
-    },
-    {
-      id: 3,
-      title: 'Humans',
-      description: 'Humans depend on plants and animals for survival.',
-    },
-  ];
-    const [usersData, setUsersData] = useState([])
-    const [loading, setLoading] = useState(true);
+  const [selectedCard, setSelectedCard] = React.useState(null);
 
-const getUsers = async () => {
-    //******GET - getAllUsers***** */
+  const [alert, setAlert] = useState({ open: false, type: "", message: "" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    type: "",
+    message: "",
+    anchor: { vertical: "top", horizontal: "center" }
+  });
+  const handleDelete = async (id) => {
+    console.log("Delete user with ID:", id);
+
     try {
-        const res = await axios.get(`http://localhost:7777/api/users/${props.page}`)
-        console.log(props.page);
-        console.log("propspage.");
-        if (res.status === 200) {
-            console.log(res.data);
-            setUsersData(res.data)
-        }
-        else{
-            
-        }
-        // debugger
+      const response = await axios.delete("http://localhost:7777/api/users/", { data: { _id: id } });
+      setSnackbar({
+        open: true,
+        type: "success",
+        message: response.data,
+        anchor: { vertical: "top", horizontal: "center" }
+      });
+      getUsers();
     } catch (e) {
-        console.error(e)
+      console.error("Error deleting user:", e);
+      setSnackbar({
+        open: true,
+        type: "error",
+        message: "Error deleting user. Please try again.",
+        anchor: { vertical: "top", horizontal: "center" }
+      });
+    }
+  };
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
+  const [usersData, setUsersData] = useState([])
+  const [loading, setLoading] = useState(true);
+
+  const getUsers = async () => {
+    setLoading(true);
+    let res 
+    try {
+      console.log(props.view);
+      {
+      if(props.view==="1"){
+              res = await axios.get(`http://localhost:7777/api/users/${props.page}`)
+      }
+      else if(props.view==="2"){
+        res = await axios.get(`http://localhost:7777/api/users/address/${props.page}`)
+      }
+    }
+      if (res.status === 200 && Array.isArray(res.data)) {
+        setUsersData(res.data)
+      }
+      else {
+        setUsersData([])
+
+      }
+    } catch (e) {
+      console.error(e)
+      setUsersData([]);
     }
     finally {
-        setLoading(false);
-      }
-      
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    getUsers();
+  }, [props.page]);
+  const bull = (
+    <Box
+      component="span"
+      sx={{ display: 'inline-block', mx: '2px', transform: 'scale(0.8)' }}
+    >
+      •
+    </Box>
+  )
 
-    //******POST - createUser***** */
-}
-useEffect(() => {
-        getUsers();
-      }, []);
-      const bull = (
-<Box
-    component="span"
-    sx={{ display: 'inline-block', mx: '2px', transform: 'scale(0.8)' }}
-  >
-    •
-  </Box>
-      )
-
-const card = (
-  <React.Fragment >
-    <CardContent>
-      <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-        Word of the Day
-      </Typography>
-      <Typography variant="h5" component="div">
-        be{bull}nev{bull}o{bull}lent
-      </Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>adjective</Typography>
-      <Typography variant="body2">
-        well meaning and kindly.
-        <br />
-        {'"a benevolent smile"'}
-      </Typography>
-    </CardContent>
-    <CardActions>
-      <Button size="small">Learn More</Button>
-    </CardActions>
-  </React.Fragment>
-);
-const [open, setOpen] = React.useState(false);
-  console.log("fffffff");
-
-  const handleClickOpen = () => {
+  const [open, setOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({
+    name: "",
+    username: "",
+    email: "",
+    address: "",
+    phone: ""
+  });
+  const [addup, setAddup] = useState(0)
+  const handleUpdate = (user) => {
+    setAddup(1)
+    setSelectedUser(user);
+    setState("Edit")
     setOpen(true);
-  console.log("fffffff");
-
+  };
+  const handleAdd = () => {
+    setAddup(2)
+    setState("Add")
+    setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+    setSelectedUser({
+      name: "",
+      username: "",
+      email: "",
+      address: "",
+      phone: ""
+    })
   };
-const nameRef = React.useRef("")
-const usernameRef = React.useRef("")
-const emailRef = React.useRef("")
-const addressRef = React.useRef("")
-const phoneRef = React.useRef("")
-const handleAddUser = async() =>{
-  console.log("newUser");
-  console.log(newUser);
-  await axios.post("http://localhost:7777/api/users",newUser)
-  getUsers()
-}
-const newUser = {
-  "name":nameRef,
-  "username":usernameRef,
-  "email":emailRef,
-  "address":addressRef,
-  "phone":phoneRef
-}
-    return(
-      <>
 
-<Box
-      sx={{
-        width: '100%',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))',
-        gap: 2,
-      }}
-    >
-      {cards.map((card, index) => (
-        <Card>
-          <CardActionArea
-            onClick={() => setSelectedCard(index)}
-            data-active={selectedCard === index ? '' : undefined}
-            sx={{
-              height: '100%',
-              '&[data-active]': {
-                backgroundColor: 'action.selected',
-                '&:hover': {
-                  backgroundColor: 'action.selectedHover',
-                },
-              },
-            }}
-          >
-            <CardContent sx={{ height: '100%' }}>
-              <Typography variant="h5" component="div">
-                {card.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {card.description}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      ))}
-    </Box>
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedUser((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  // Handle submission of the updated data
+  const handleSubmit = async () => {
 
-        <div>
-        {loading ? (
-          <p>Loading...</p>
-        ) : usersData.length > 0 ? (
-          usersData.map((user) => (
-            <div
-              key={user._id}
-              style={{ border: '1px solid #ccc', padding: '10px', margin: '10px' }}
-            >
-              <p><strong>Name:</strong> {user.name}</p>
-              <p><strong>Username:</strong> {user.username}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Phone:</strong> {user.phone}</p>
-              <p><strong>Address:</strong> {user.address}</p>
-            </div>
-          ))
-        ) : (
-          <p>No users found.</p>
-        )}
-           {/* <Box sx={{ minWidth: 275 }}>
-      <Card variant="outlined">{card}</Card>
-    </Box> */}
+    try {
+      let response;
+      if (addup === 1) {
+        response = await axios.put("http://localhost:7777/api/users/", selectedUser);
+      }
+      else {//if(addup===2){
+        response = await axios.post("http://localhost:7777/api/users/", selectedUser);
+      }
+      setSnackbar({
+        open: true,
+        type: "success",
+        message: response.data,
+        anchor: { vertical: "top", horizontal: "center" }
+      });
+      getUsers();
+    } catch (e) {
+      console.error("Error deleting user:", e);
+      setSnackbar({
+        open: true,
+        type: "error",
+        message: "Error deleting user. Please try again.",
+        anchor: { vertical: "top", horizontal: "center" }
+      });
+    }
+
+    handleClose();
+  };
+  const [state,setState] = useState("")
+  return (
+    <>
+      <div>
+        <Box
+          sx={{
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))",
+            gap: 4,
+          }}
+        >
+          {loading ? (
+            <p>Loading...</p>
+          ) : usersData && usersData.length > 0 ? (
+            usersData.map((user, index) => (
+              <Card key={user._id}>
+                <CardActionArea
+                  onClick={() => setSelectedCard(index === selectedCard ? null : index)}
+                  data-active={selectedCard === index ? "" : undefined}
+                  sx={{
+                    flexGrow: 1,
+                    "&[data-active]": {
+                      backgroundColor: "action.selected",
+                      "&:hover": {
+                        backgroundColor: "action.selectedHover",
+                      },
+                    },
+                  }}
+                >
+                  <CardContent>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontSize: "12px", position: "absolute", top: 8, left: 8 }}
+                    >
+                      ID: {user._id}
+                    </Typography>
+                    <Typography variant="h6" component="div" sx={{ mt: 3, mb: 1, fontSize: "30px", fontStyle: "italic", fontFamily: "fantasy" }}>
+                      {user.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {user.email}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {user.phone}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <AddCircleOutlineIcon fontSize="small" sx={{ mr: 1 }} />
+                        {selectedCard !== index && "More Details"}
+                      </div>
+                      {selectedCard === index && (
+                        <div style={{ marginTop: "8px", textAlign: "center" }}>
+                          <div>Username: {user.username}</div>
+                          <div>Address: {user.address}</div>
+                        </div>
+                      )}
+                    </Typography>
+
+
+                  </CardContent>
+                </CardActionArea>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: 4,
+                    justifyContent: "flex-start",
+                    padding: "8px",
+                    gap: "0.5px",
+                    borderTop: "1px solid #ccc",
+                  }}
+                >
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(user._id)}
+                    sx={{ fontSize: "small" }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleUpdate(user)}
+                    sx={{ fontSize: "small" }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Box>
+              </Card>
+            ))) : props.page > 0 ? (
+              <p>No more users found.</p>
+            ) : (
+            <p>No users found.</p>
+          )}
+        </Box>
       </div>
-      {/* <Stack spacing={2} direction="row">
-      <Button variant="text">1</Button>
-      <Button variant="contained">2</Button>
-      <Button variant="outlined">Outlined</Button>
-    </Stack> */}
-             {props.ah&&(<Fab color="primary" aria-label="add" size='medium' onClick={handleClickOpen} >
-  <AddIcon />
-</Fab>)}
-<React.Fragment width="1px">
+   
+      {props.ah && (<Fab
+        color="primary"
+        aria-label="add"
+        size="medium"
+        onClick={handleAdd}
+        sx={{
+          position: "fixed",
+          bottom: { xs: 16, md: 32 }, // Adjust for small and medium screens
+          left: { xs: 16, md: 32 },
+          zIndex: 1000
+        }}
+      >
+        <PersonAddIcon />
+      </Fab>)}
 
+      <React.Fragment>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>{state} User</DialogTitle>
+          <DialogContent>
+            <TextField
+              required
+              margin="dense"
+              id="name"
+              name="name"
+              label="Name"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={selectedUser.name} // Controlled input value
+              onChange={handleInputChange} // Track changes
+            />
+            <DialogContentText>Name</DialogContentText>
 
-<Dialog
-  open={open}
-  onClose={handleClose}
-  // PaperProps={{
-  //   component: 'form',
-  //   onSubmit: (event) => {
-  //     event.preventDefault();
-  //     const formData = new FormData(event.currentTarget);
-  //     const formJson = Object.fromEntries(formData.entries());
-  //     const name = formJson.name;
-  //     const username = formJson.username;
-  //     const email = formJson.email;
-  //     const address = formJson.address;
-  //     const phone = formJson.phone;
-  //     console.log(formJson);
-  //     console.log("formJson");
-  //     handleClose();
-  //     handleAddUser()
+            <TextField
+              margin="dense"
+              id="username"
+              name="username"
+              label="Username"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={selectedUser.username}
+              onChange={handleInputChange}
+            />
+            <DialogContentText>Username</DialogContentText>
 
-  //   },
-  // }}
->
-  <DialogTitle>Add a User</DialogTitle>
-  <DialogContent>
-    
-    <TextField
-      autoFocus
-      required
-      margin="dense"
-      id="name"
-      name="email"
-      label="name"
-      type="text"
-      fullWidth
-      variant="standard"
-      inputRef={nameRef}
-      // HTMLInputElement={nameRef}
-    />
-    <DialogContentText>
-     name
-    </DialogContentText>
+            <TextField
+              required
+              margin="dense"
+              id="email"
+              name="email"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+              value={selectedUser.email}
+              onChange={handleInputChange}
+            />
+            <DialogContentText>Email</DialogContentText>
 
-    <TextField
-      autoFocus
-      margin="dense"
-      id="name"
-      name="email"
-      label="username"
-      type="text"
-      fullWidth
-      variant="standard"
-      inputRef={usernameRef}
-      // HTMLInputElement={usernameRef}
+            <TextField
+              margin="dense"
+              id="address"
+              name="address"
+              label="Address"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={selectedUser.address}
+              onChange={handleInputChange}
+            />
+            <DialogContentText>Address</DialogContentText>
 
-    />
-        <DialogContentText>
-     username
-    </DialogContentText>
-  
-    <TextField
-      autoFocus
-      required
-      margin="dense"
-      id="name"
-      name="email"
-      label="Email Address"
-      type="email"
-      fullWidth
-      variant="standard"
-      inputRef={emailRef}
-      // HTMLInputElement={emailRef}
-    />
-          <DialogContentText>
-    email
-    </DialogContentText>
+            <TextField
+              required
+              margin="dense"
+              id="phone"
+              name="phone"
+              label="Phone"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={selectedUser.phone}
+              onChange={handleInputChange}
+            />
+            <DialogContentText>Phone</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleSubmit}>Submit</Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
 
-    <TextField
-      autoFocus
-      margin="dense"
-      id="name"
-      name="email"
-      label="address"
-      type="text"
-      fullWidth
-      variant="standard"
-      inputRef={addressRef}
-      // HTMLInputElement={addressRef}
-    />
-            <DialogContentText>
-  address
-    </DialogContentText>
-    
-    <TextField
-      autoFocus
-      required
-      margin="dense"
-      id="name"
-      name="email"
-      label="phone"
-      type="text"
-      fullWidth
-      variant="standard"
-      inputRef={phoneRef}
-      // HTMLInputElement={phoneRef}
-    />
-        <DialogContentText>
-    phone
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleClose}>Cancel</Button>
-    <Button onClick={handleAddUser}>Submit </Button>
-    {/* <Button type="submit" onClick={handleAddUser}>Submit </Button> */}
-  </DialogActions>
-</Dialog>
-</React.Fragment>
-      </>
-    )
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={snackbar.anchor}
+      >
+        <Alert
+          severity={snackbar.type} // "success" or "error"
+          onClose={handleCloseSnackbar}
+          variant="filled" // Optional: Makes the alert background filled
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
+  )
 }
 
 export default Users

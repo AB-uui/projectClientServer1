@@ -6,7 +6,7 @@ const User = require('../models/User')
 const getAllUsers = async (req,res)=>{
     const {page} = req.params
     console.log(Number(page)*10)
-    const users = await User.find().sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+    const users = await User.find().sort({_id:1}).skip(Number(page)*9).limit(9).lean()
 
     if(!users){
         return res.status(400).send("no users found")
@@ -22,7 +22,7 @@ const getAllUsers = async (req,res)=>{
 //משתמשים שיש להם כתובת
 const getUsersWithAddress = async (req,res) => {
     const page = req.params
-    const usersWithAddress = await User.find({address:{$ne:"only mail"}}).sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+    const usersWithAddress = await User.find({address:{$ne:"only mail"}}).sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!usersWithAddress?.length){
         return res.status(400).send("no users With Address found")
     }
@@ -36,10 +36,14 @@ const createUser = async (req,res)=>{
         return res.status(400).send("name & email & phone is required")
     }
     const user = await User.create({name, username, email, address, phone})
+    console.log(user);
+    
     if(!user){
         return res.status(400).send("invalid user")
     }
-    res.status(201).json(user)
+    // res.status(201).json(user)
+    res.json(`${user.name} add`)
+
 }
 
 // יישום הלקוח וקוד השרת יאפשרו עדכון )PU תוכן משתמש מסוים
@@ -58,6 +62,8 @@ const updateUser = async (req,res) => {
 // יישום הלקוח וקוד השרת יאפשרו מחיקת )DELET משתמש מבסיס הנתונים.
 const deleteUser = async (req,res)=>{
     const {_id} = req.body
+    console.log(_id);
+    
     if(!_id){
         return res.status(400).send("id is required")
     }
