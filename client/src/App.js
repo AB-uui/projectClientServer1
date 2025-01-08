@@ -5,15 +5,13 @@ import Users from './components/user';
 import Todos from './components/todo';
 import Posts from './components/post';
 import Photos from './components/photo';
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { AppBar, Toolbar, IconButton, Drawer, Typography, Grid, Box, Button, Select, FormControl, MenuItem, InputLabel, OutlinedInput, TextField, Pagination, Stack, Fab } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Navbar from "./components/navbarMenu";
-import FullWidthTabs from './components/navbarMenu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
-import FormDialog from './components/userA';
 
 function App() {
   const navigate = useNavigate()
@@ -32,7 +30,7 @@ function App() {
     setText(event.target.value);
     setPage(0)
   };
-  
+
   // const handleClose = async () => {
   //   setOpen(false);
     
@@ -70,7 +68,9 @@ function App() {
     setPage(0)
     };
   const [page, setPage] = React.useState(0);
-
+  useEffect(() => {
+          
+  }, [page]);
   const handlePage = (event, value) => {
     setPage(value - 1);
     console.log(value);
@@ -138,12 +138,13 @@ function App() {
         </Toolbar>
       </AppBar>
 
-      {ah && (<Grid container spacing={4} sx={{ padding: 8 }}>
+      {/* {ah && ( */}
+        <Grid container spacing={4} sx={{ padding: 8 }}>
         <Grid container rowSpacing={2} xs={12} sm={12} md={12} >
           <Grid xs={12}>
 
             <Box
-              sx={{
+              sx={{ 
                 padding: 4,
                 textAlign: "center",
                 backgroundColor: "#e0f7fa",
@@ -152,15 +153,14 @@ function App() {
             >
 
               <Routes>
-                <Route path="/users" element={<Users key={page} text={text} view={view} page={page} ah={ah} />} />
-                <Route path="/todos" element={<Todos key={page} text={text} view={view} page={page} ah={ah} />} />
-                <Route path="/posts" element={<Posts key={page} text={text} view={view} page={page} ah={ah} />} />
+                <Route path="/users" element={<Users key={page} text={text} view={view} page={page} ah={ah} setAh={setAh}/>} />
+                <Route path="/todos" element={<Todos key={page} text={text} view={view} page={page} ah={ah} setAh={setAh}/>} />
+                <Route path="/posts" element={<Posts key={page} text={text} view={view} page={page} ah={ah} setAh={setAh}/>} />
                 <Route path="/photos" element={<Photos />} />
-                <Route path="/add" element={<FormDialog />} />
               </Routes>
             </Box>
           </Grid>
-          <Grid container justifyContent="center" xs={12}>
+          {ah && (<Grid container justifyContent="center" xs={12}>
             <Box sx={{ width: "40%" }} />
             <Box
               sx={{
@@ -174,14 +174,16 @@ function App() {
                 width: "100%",
               }}
             >
-              <Stack spacing={2}>
-                <Pagination count={10} onChange={handlePage} />
+      
+      <Stack spacing={2}>
+                <Pagination count={10}  onChange={handlePage} />
               </Stack>
             </Box>
-          </Grid>
+          </Grid>)}
 
         </Grid>
-      </Grid>)}
+      </Grid>
+      {/* )} */}
       <Drawer anchor="left" open={isDrawerOpen} onClose={handleDrawerToggle}>
         <Navbar whatOpen={setWhatOpen} isDrawerOpen={setIsDrawerOpen} criteria={setCriteria} view={setView} ah={setAh} />
       </Drawer>

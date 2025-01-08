@@ -56,6 +56,7 @@ const Users = (props) => {
 
   const getUsers = async () => {
     setLoading(true);
+    props.setAh(true)
     let res
     try {
       if (!props.text) {
@@ -87,7 +88,7 @@ const Users = (props) => {
   }
   useEffect(() => {
     getUsers();
-  }, [props.page,props.text]);
+  }, [props.page, props.text]);
   const bull = (
     <Box
       component="span"
@@ -135,36 +136,6 @@ const Users = (props) => {
       ...prev,
       [name]: value
     }));
-  };
-  // Handle submission of the updated data
-  const handleSubmit = async () => {
-
-    try {
-      let response;
-      if (addup === 1) {
-        response = await axios.put("http://localhost:7777/api/users/", selectedUser);
-      }
-      else {//if(addup===2){
-        response = await axios.post("http://localhost:7777/api/users/", selectedUser);
-      }
-      setSnackbar({
-        open: true,
-        type: "success",
-        message: response.data,
-        anchor: { vertical: "top", horizontal: "center" }
-      });
-      getUsers();
-    } catch (e) {
-      console.error("Error deleting user:", e);
-      setSnackbar({
-        open: true,
-        type: "error",
-        message: "Error deleting user. Please try again.",
-        anchor: { vertical: "top", horizontal: "center" }
-      });
-    }
-
-    handleClose();
   };
   const [state, setState] = useState("")
   return (
@@ -287,10 +258,47 @@ const Users = (props) => {
       </Fab>)}
 
       <React.Fragment>
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose}
+          PaperProps={{
+            component: 'form',
+            onSubmit: async (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
+              const formJson = Object.fromEntries(formData.entries());
+              const email = formJson.email;
+              console.log(email);
+
+              try {
+                let response;
+                if (addup === 1) {
+                  response = await axios.put("http://localhost:7777/api/users/", selectedUser);
+                }
+                else {//if(addup===2){
+                  response = await axios.post("http://localhost:7777/api/users/", selectedUser);
+                }
+                setSnackbar({
+                  open: true,
+                  type: "success",
+                  message: response.data,
+                  anchor: { vertical: "top", horizontal: "center" }
+                });
+                getUsers();
+              } catch (e) {
+                console.error("Error:", e);
+                setSnackbar({
+                  open: true,
+                  type: "error",
+                  message: `Error ${state} user. Please try again.`,
+                  anchor: { vertical: "top", horizontal: "center" }
+                });
+              }
+              handleClose();
+            },
+          }}>
           <DialogTitle>{state} User</DialogTitle>
           <DialogContent>
             <TextField
+              autoFocus
               required
               margin="dense"
               id="name"
@@ -360,7 +368,7 @@ const Users = (props) => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSubmit}>Submit</Button>
+            <Button type="submit">Submit</Button>
           </DialogActions>
         </Dialog>
       </React.Fragment>

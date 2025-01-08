@@ -74,7 +74,7 @@ const getPostsByText = async (req,res)=>{
     const posts = await Post.find({$or:[
            {title:{$regex:text,$options:'i'}},
            {body: {$regex:text,$options:'i'}}
-         ]}).sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+         ]}).sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!posts?.length){
         return res.status(400).send("no posts found")
     }

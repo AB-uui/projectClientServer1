@@ -5,7 +5,6 @@ const User = require('../models/User')
 // פריטים ברשימה יסודרו לפי מספר ה- id שלהם
 const getAllUsers = async (req,res)=>{
     const {page} = req.params
-    console.log(Number(page)*10)
     const users = await User.find().sort({_id:1}).skip(Number(page)*9).limit(9).lean()
 
     if(!users){
@@ -85,7 +84,7 @@ const getFilterUsers = async (req,res)=>{
            {username: {$regex:text,$options:'i'}},
            {mail: {$regex:text,$options:'i'}},
            {phone: {$regex:text,$options:'i'}}
-         ]}).sort({_id:1}).skip(Number(page)*10).limit(10).lean()
+         ]}).sort({_id:1}).skip(Number(page)*9).limit(9).lean()
     if(!users?.length){
         return res.status(400).send("no users found")
     }

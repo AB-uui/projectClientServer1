@@ -66,9 +66,10 @@ const Todos = (props) => {
 
     const getTodos = async () => {
         setLoading(true);
+        props.setAh(true)
         console.log(props.view);
         console.log("props.view");
-        
+
         try {
             let res;
             if (!props.text) {
@@ -143,36 +144,6 @@ const Todos = (props) => {
                 [name]: value,
             }));
         }
-    };
-    // Handle submission of the updated data
-    const handleSubmit = async () => {
-
-        try {
-            let response;
-            if (addup === 1) {
-                response = await axios.put("http://localhost:7777/api/todos/", selectedTodo);
-            }
-            else {//if(addup===2){
-                response = await axios.post("http://localhost:7777/api/todos/", selectedTodo);
-            }
-            setSnackbar({
-                open: true,
-                type: "success",
-                message: response.data,
-                anchor: { vertical: "top", horizontal: "center" }
-            });
-            getTodos();
-        } catch (e) {
-            console.error("Error deleting todo:", e);
-            setSnackbar({
-                open: true,
-                type: "error",
-                message: "Error deleting todo. Please try again.",
-                anchor: { vertical: "top", horizontal: "center" }
-            });
-        }
-
-        handleClose();
     };
     const [state, setState] = useState("")
     return (
@@ -301,10 +272,47 @@ const Todos = (props) => {
             </Fab>)}
 
             <React.Fragment>
-                <Dialog open={open} onClose={handleClose}>
+                <Dialog open={open} onClose={handleClose}
+                    PaperProps={{
+                        component: 'form',
+                        onSubmit: async (event) => {
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const formJson = Object.fromEntries(formData.entries());
+                            const email = formJson.email;
+                            console.log(email);
+
+                            try {
+                                let response;
+                                if (addup === 1) {
+                                    response = await axios.put("http://localhost:7777/api/todos/", selectedTodo);
+                                }
+                                else {//if(addup===2){
+                                    response = await axios.post("http://localhost:7777/api/todos/", selectedTodo);
+                                }
+                                setSnackbar({
+                                    open: true,
+                                    type: "success",
+                                    message: response.data,
+                                    anchor: { vertical: "top", horizontal: "center" }
+                                });
+                                getTodos();
+                            } catch (e) {
+                                console.error("Error:", e);
+                                setSnackbar({
+                                    open: true,
+                                    type: "error",
+                                    message: `Error ${state} todo. Please try again.`,
+                                    anchor: { vertical: "top", horizontal: "center" }
+                                });
+                            }
+                            handleClose();
+                        },
+                    }}>
                     <DialogTitle>{state} Todo</DialogTitle>
                     <DialogContent>
                         <TextField
+                            autoFocus
                             required
                             margin="dense"
                             id="title"
@@ -317,19 +325,6 @@ const Todos = (props) => {
                             onChange={handleInputChange} // Track changes
                         />
                         <DialogContentText>Title</DialogContentText>
-
-                        {/* <TextField
-                            margin="dense"
-                            id="tags"
-                            name="tags"
-                            label="Tags"
-                            type="text"
-                            fullWidth
-                            variant="standard"
-                            value={selectedTodo.tags}
-                            onChange={handleInputChange}
-                        />
-                        <DialogContentText>Tags</DialogContentText> */}
                         <TextField
                             margin="dense"
                             id="tags"
@@ -367,7 +362,7 @@ const Todos = (props) => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={handleSubmit}>Submit</Button>
+                        <Button type='submit'>Submit</Button>
                     </DialogActions>
                 </Dialog>
             </React.Fragment>

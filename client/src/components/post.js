@@ -56,6 +56,7 @@ const Posts = (props) => {
 
     const getPosts = async () => {
         setLoading(true);
+        props.setAh(true)
         let res
         try {
             if (!props.text) {
@@ -124,36 +125,6 @@ const Posts = (props) => {
             ...prev,
             [name]: value
         }));
-    };
-    // Handle submission of the updated data
-    const handleSubmit = async () => {
-
-        try {
-            let response;
-            if (addup === 1) {
-                response = await axios.put("http://localhost:7777/api/posts/", selectedPost);
-            }
-            else {//if(addup===2){
-                response = await axios.post("http://localhost:7777/api/posts/", selectedPost);
-            }
-            setSnackbar({
-                open: true,
-                type: "success",
-                message: response.data,
-                anchor: { vertical: "top", horizontal: "center" }
-            });
-            getPosts();
-        } catch (e) {
-            console.error("Error deleting Post:", e);
-            setSnackbar({
-                open: true,
-                type: "error",
-                message: "Error deleting Post. Please try again.",
-                anchor: { vertical: "top", horizontal: "center" }
-            });
-        }
-
-        handleClose();
     };
     const [state, setState] = useState("")
     return (
@@ -252,10 +223,46 @@ const Posts = (props) => {
             </Fab>)}
 
             <React.Fragment>
-                <Dialog open={open} onClose={handleClose}>
+                <Dialog open={open} onClose={handleClose}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: async(event) => {
+                      event.preventDefault();
+                      const formData = new FormData(event.currentTarget);
+                      const formJson = Object.fromEntries(formData.entries());
+                      const email = formJson.email;
+                      console.log(email);
+                      try {
+                        let response;
+                        if (addup === 1) {
+                            response = await axios.put("http://localhost:7777/api/posts/", selectedPost);
+                        }
+                        else {//if(addup===2){
+                            response = await axios.post("http://localhost:7777/api/posts/", selectedPost);
+                        }
+                        setSnackbar({
+                            open: true,
+                            type: "success",
+                            message: response.data,
+                            anchor: { vertical: "top", horizontal: "center" }
+                        });
+                        getPosts();
+                    } catch (e) {
+                        console.error("Error deleting Post:", e);
+                        setSnackbar({
+                            open: true,
+                            type: "error",
+                            message: `Error ${state} post. Please try again.`,
+                            anchor: { vertical: "top", horizontal: "center" }
+                        });
+                    }
+                      handleClose();
+                    },
+                  }}>
                     <DialogTitle>{state} Post</DialogTitle>
                     <DialogContent>
                         <TextField
+                            autoFocus
                             required
                             margin="dense"
                             id="title"
@@ -285,7 +292,7 @@ const Posts = (props) => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={handleSubmit}>Submit</Button>
+                        <Button type='submit'>Submit</Button>
                     </DialogActions>
                 </Dialog>
             </React.Fragment>
